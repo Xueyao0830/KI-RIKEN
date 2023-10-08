@@ -1,0 +1,418 @@
+---
+title: "Assignment1"
+author: "Xueyao"
+date: "2023-10-07"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+## Task 1 - Literature
+
+### 1. Read the research article of the hands-on working group you are assigned to
+
+![](journal_club.png)
+
+### 2.1 What is the medically relevant insight from the article?
+
+This article provides medically relevant insights regarding the
+functional annotation of human long noncoding RNAs(lncRNAs) through
+molecular phenotyping. It reports the results of a pilot study that
+systematically knocked down the expression of 285 lncRNAs in human
+dermal fibroblasts. The study found that the knockdown of specific
+lncRNAs resulted in distinct cellular phenotypes, measured through
+cellular growth, morphological changes, and transcriptomic responses.
+This molecular phenotyping provided insights into the affected genes and
+pathways. An example of the medically relevant insight from the article
+is the identification of two specific lncRNAs, ZNF213-AS1 and
+lnc-KHDC3L-2, that were found to play functional roles in gene
+regulation. These findings contribute to our understanding of the roles
+of lncRNAs in gene regulation, which can have implications for future
+research and potential therapeutic targets in various diseases.
+
+### 2.2 Which genomics technology/ technologies were used?
+
+Cap Analysis of Gene Expression (CAGE) is a technique used in molecular
+biology to analyze and quantify the expression levels of genes,
+particularly those associated with transcription initiation. CAGE is
+especially useful for identifying and quantifying the 5' ends of mRNAs
+and non-coding RNAs.
+
+### 3. List and explain at least three questions/ hypotheses you can think of that extend the analysis presented in the paper.
+
+1.  What are the specific molecular mechanisms by which the knockdown of
+    certain lncRNAs leads to cellular phenotypic changes?
+
+    The study identified specific lncRNAs whose knockdown impacted cell
+    growth and morphology, but the exact mechanisms by which these
+    changes occur are not fully understood. Further research could
+    investigate the downstream effects and molecular pathways affected
+    by the knockdown of these lncRNAs.
+
+2.  Are there any functional relationships between the identified
+    lncRNAs and their associated genes or pathways?
+
+    The study found that knockdown of certain lncRNAs resulted in
+    changes in gene expression. However, it would be interesting to
+    explore whether these lncRNAs have specific interactions with the
+    genes or pathways they affect. This could involve conducting
+    additional experiments or analyzing existing datasets to determine
+    if there are any regulatory relationships between specific lncRNAs
+    and their associated genes.
+
+3.  Can the findings from this study be generalized to different cell
+    types or biological contexts?
+
+    The study focused on human dermal fibroblasts, but it would be
+    valuable to determine if the functional roles of lncRNAs identified
+    in this study hold true in other cell types or biological systems.
+    This could involve conducting similar experiments in different cell
+    types or analyzing existing datasets to compare the effects of
+    lncRNA knockdown across different biological contexts.
+
+## Task4- Using R example datasets
+
+### 2. Describe briefly the content of the CO2 dataset using the help function
+
+This CO2 data frame has 84 rows and 5 columns of data from an experiment
+on the cold tolerance of the grass specifices Echinochloa crus-galli. 1.
+columns: Plant(an ordered factor), Type(a factor), Treatment(a factor),
+conc(a numeric vector), uptake(a numeric vector) 2. details: The CO2
+uptake of six plants from Quebec and six plants from Mississippi was
+measured at several levels of ambient CO2 concentration. Half the plants
+of each type were chilled overnight before the experiment was conducted.
+
+### 3. What is the average and median CO2 uptake of the plants from
+
+Quebec and Mississippi?
+
+```{r,results=FALSE}
+mean(CO2$uptake[CO2$Type == 'Quebec'])  
+#[1] 33.54286
+median(CO2$uptake[CO2$Type == 'Quebec'])
+#[1] 37.15
+
+mean(CO2$uptake[CO2$Type == 'Mississippi'])
+#[1] 20.88333
+median(CO2$uptake[CO2$Type == 'Mississippi'])
+#[1] 19.3
+```
+
+### 4. In the "airway" example data from Bioconductor, how many genes are expressed in each sample? How many genes are not expressed in any sample?
+
+```{r,results=FALSE}
+# how many genes are expressed in each sample
+airway@colData@listData$SampleName
+#[1] GSM1275862 GSM1275863 GSM1275866 GSM1275867 GSM1275870 GSM1275871 GSM1275874
+#[8] GSM1275875
+colSums(airway@assays@data$counts>0)
+#[1] 24633 24527 25699 23124 25508 25998 24662 23991
+
+# how many genes are not expressed in any sample
+sum(rowSums(airway@assays@data$counts==0) == ncol(airway@assays@data$counts))
+#[1] 30208
+```
+
+## task5 - R functions
+
+### 1. Write a function that calculates the ratio of the mean and the median of a given vector.
+
+```{r,results=FALSE}
+mean_median <- function(x){
+  c(mean(x),median(x))
+}
+```
+
+### 2. Write a function that ignores the lowest and the highest value from a given vector and calculate the mean.
+
+```{r,results=FALSE}
+mean_not_lowest_highest <- function(x){
+  if(length(x) < 3) {
+    stop("Vector should have at least 3 elements.")
+  }
+  
+  sort <- sort(x)[-length(x)][-1]
+  mean(sort)
+}
+```
+
+### 3. Read about piping from here:<https://r4ds.had.co.nz/pipes.html#pipes> (you don't have to learn everything, a basic understanding of the usage is enough). Write a short (max. 300 characters, no spaces) explanation of why, how, and when not to use pipes.
+
+-   Why use pips
+
+    1.  Readability: It helps to improve the readability of complex data
+        manipulation by presenting operations in a more rational order
+    2.  Modularization: It facilities breaking down complex operations
+        into smaller, more manageable steps, making code easier to
+        maintain and debug.
+    3.  It helps to avoid deeply nested function calls, which can occur
+        when applying multiple operations sequentially.
+
+-   How to use pips
+
+    The pips works by performing a 'lexical transformation': behind the
+    scenes, magrittr reassembles the code in the pipe to a form that
+    works by overwriting an intermediate object.
+
+-   When not to use pips
+
+    1.  The pipes are longer than 10 steps
+    2.  multiple inputs or outputs
+    3.  need to think about a directed graph with a complex dependency
+        structure
+
+### 4. Familiarize yourself with the apply-family of functions (apply, lapply, sapply etc.) <http://uc-r.github.io/apply_family>. Write a short explanation (max. 300 characters, no spaces) of why they could be useful in your work
+
+The apply family functions is highly valuable due to the biological
+data, which often involves complex datasets with multiple dimensions and
+requires various operations. In addition, it can simplify data
+transformation and cleaning simultaneously. In bioinformatics, it is
+common to calculate summary statistics or aggregate data based on
+certain criteria. It can also simplify handling of lists and data frames
+and it allows parallel processing for efficiency.
+
+## Task 6 - Basic visualization with R
+
+### 1. Compare the distributions of the body heights of the two species from the 'magic_guys.csv' dataset graphically
+
+```{r,results=FALSE}
+# Load the 'magic_guys.csv'
+magic_guys <- read_csv('magic_guys.csv')
+```
+
+#### 'hist' function
+
+```{r,results=FALSE}
+png('hist.png')
+png('hist.pdf')
+png('hist.svg')
+hist_data_jedi <- magic_guys$weight[magic_guys$species == "jedi"]
+hist_data_sith <- magic_guys$weight[magic_guys$species == "sith"]
+breaks <- seq(30,90,by=2)
+hist(
+  x=hist_data_jedi,
+  col="blue",
+  main='histogram of the weight by species',
+  xlab='weight',
+  ylab='frequency',
+  breaks=breaks,
+)
+hist(hist_data_sith,
+  breaks = breaks,,
+  col = "red",
+  add = TRUE)
+
+legend("topright", legend = c("jedi", "sith"), fill = c("blue", "red"))
+
+
+dev.off()
+```
+
+#### 'ggplot'
+
+```{r,results=FASLE}
+library(ggplot2)
+```
+
+```{r,results=FASLE}
+hist_ggplot <- ggplot(magic_guys, aes(x = weight, fill = species)) +
+  geom_histogram(binwidth = 5,position='identity',alpha=0.5) +
+  labs(x = "Weight", y = "Frequency") +
+  scale_fill_manual(values = c('jedi'="blue",'sith'= "red"))+
+  theme_minimal()
+ggsave('hist_ggplot.png',plot=hist_ggplot,device='png')
+ggsave('hist_ggplot.pdf',plot=hist_ggplot,device='pdf')
+ggsave('hist_ggplot.svg',plot=hist_ggplot,device='svg')
+```
+
+### 2. Do the same comparison as in a. but with boxplots. If you want to use the ggplot2-package, use the functions 'ggplot' and 'geom_boxplot'.
+
+#### 1. boxplot
+
+```{r,results=FASLE}
+boxplot(weight ~ species, data = magic_guys,
+        xlab = "Species", ylab = "Weight",
+        col = c('jedi'="blue",'sith'= "red"),
+        main = "Boxplot of Weight Grouped by Species")
+legend("topright", legend = c("jedi", "sith"), fill = c("blue", "red"))
+```
+
+#### 2.ggplot
+
+```{r,results=FASLE}
+box_ggplot <- ggplot(magic_guys, aes(x = species, y=weight, fill = species)) +
+  geom_boxplot(position='dodge',alpha=0.5) +
+  labs(x = "species", y = "weight") +
+  scale_fill_manual(values = c('jedi'="blue",'sith'= "red"))+
+  theme_minimal()
+ggsave('box_ggplot.png',plot=box_ggplot,device='png')
+ggsave('box_ggplot.pdf',plot=box_ggplot,device='pdf')
+ggsave('box_ggplot.svg',plot=box_ggplot,device='svg')
+```
+
+#### 3.Save the plots with the 'png', 'pdf', and 'svg' formats. In which situation would you use which file format?
+
+1.  PNG It is for images that have a lot of details, such as photographs
+    or complex graphics. In addition, it is suitable for web use and
+    digital displays.
+
+2.  PDF It is for vector graphics. Ideal for plots and graphics that
+    need to be resized without loss of quality. It is suitable for
+    documents, reports and high-quality prints.
+
+3.  SVG It is for vector graphics that can be easily edited and resized
+    without loss of quality. It is best for graphics that may need to be
+    further edited or modified.
+
+### 2. Load the gene expression data matrix from the 'microarray_data.tab' dataset provided in the shared folder, it is a big tabular separated matrix.
+
+```{r,results=FASLE}
+microarray_data = read.table('microarray_data.tab',sep = '\t',header = TRUE)
+head(microarray_data)
+```
+
+#### 1. How big is the matrix in terms of rows and columns?
+
+```{r,results=FASLE}
+c(nrow(microarray_data),ncol(microarray_data))
+```
+
+#### 2. Count the missing values per gene and visualize this result
+
+```{r,results=FASLE}
+NA_per_gene <- colSums(is.na(microarray_data))
+NA_per_gene_df <- data.frame(Gene=colnames(microarray_data),NA_per_gene=NA_per_gene)
+average_NA <- mean(NA_per_gene_df$NA_per_gene)
+NA_per_gene_df$color <- ifelse(NA_per_gene_df$NA_per_gene>average_NA,'above_average','below_average')
+ggplot(NA_per_gene_df, aes(x = Gene, y = NA_per_gene,fill=color)) +
+  geom_bar(stat = "identity") +
+  geom_hline(yintercept = average_NA,color='red',linetype='dashed',size=1) +
+  labs(title='barplot missing gene counts',x = "Genes", y = "Number of Missing Values") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        plot.title = element_text(hjust = 0.5)) +
+  scale_fill_manual(values=c('above_average'='orange','below_average'='blue'))
+```
+
+```{r,results=FASLE}
+NA_per_gene <- colSums(is.na(microarray_data))
+NA_per_gene_df <- data.frame(Gene=colnames(microarray_data),NA_per_gene=NA_per_gene)
+ggplot(data = NULL, aes(x = NA_per_gene)) +
+  geom_histogram(binwidth = 10, fill = "blue", alpha = 0.5) +
+  labs(x = "Number of Missing Values per Gene", y = "Frequency") +
+  theme_minimal()
+```
+
+#### 3. Find the genes for which there are more than X% (X=10%, 20%, 50%) missing values.
+
+```{r,results=FASLE}
+NA_per_gene_df$proportations <- colSums(is.na(microarray_data))/nrow(microarray_data)
+
+NA_over_50_genes <- NA_per_gene_df$Gene[NA_per_gene_df$proportations>0.5]
+NA_over_20_genes <- NA_per_gene_df$Gene[NA_per_gene_df$proportations>0.2]
+NA_over_10_genes <- NA_per_gene_df$Gene[NA_per_gene_df$proportations>0.1]
+
+```
+
+#### 4. Replace the missing values by the average expression value for the particular gene. (Note: Imputing data has to be used with caution!)
+
+```{r,results=FASLE}
+NA_per_gene_df$average <- colMeans(microarray_data,na.rm = TRUE)
+microarray_data <- apply(microarray_data,2,function(col){
+ifelse(is.na(col),NA_per_gene_df$average,col)  
+})
+
+```
+
+### 3. Visualize the data in the CO2 dataset in a way that gives you a deeper understanding of the data. What do you see?
+
+```{r,results=FASLE}
+ggplot(CO2, aes(x = Type, y=uptake, fill = Type)) +
+  geom_boxplot(position='dodge',alpha=0.5) +
+  labs(x = "Type", y = "uptake") +
+  scale_fill_manual(values = c('Quebec'="blue",'Mississippi'= "red"))+
+  theme_minimal()
+```
+
+Quebec could have more CO2 uptake than mississippi
+
+```{r,results=FASLE}
+ggplot(CO2, aes(x = conc, y = uptake, color = Type)) +
+  geom_point() +
+  labs(x = "Concentration", y = "CO2 Uptake",color = "Type") +
+  theme_minimal()
+```
+
+The CO2 uptake of both quebec and mississippi increased with the
+concentration increased Quebec could have more CO2 uptake than
+mississippi
+
+## Task 7
+
+```{r,results=FASLE}
+install.packages('devtools')
+devtools::install_github("hirscheylab/tidybiology")
+```
+
+### 1. Extract summary statistics (mean, median and maximum) for the following variables from the 'chromosome' data: variations, protein coding genes, and miRNAs. Utilize the tidyverse functions to make this as simply as possible.
+
+```{r,results=FASLE}
+chromosome <- tidybiology::chromosome
+variables_of_chromosome <- c("variations", "protein_codinggenes","mi_rna")
+summary_stats <- chromosome %>%
+  summarise_at(vars(one_of(variables_of_chromosome)), 
+               list(mean = ~mean(., na.rm = TRUE),
+                    median = ~median(., na.rm = TRUE),
+                    max = ~max(., na.rm = TRUE)))
+summary_stats
+```
+
+### 2. How does the chromosome size distribute? Plot a graph that helps to visualize this by using ggplot2 package functions
+
+```{r,results=FASLE}
+ggplot(chromosome, aes(x = length_mm)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black") +
+  labs(x = "Chromosome size", y = "frequency") +
+  theme_minimal()
+```
+
+### 3. Does the number of protein coding genes or miRNAs correlate with the length of the chromosome? Make two separate plots to visualize these relationships
+
+```{r,results=FASLE}
+ggplot(chromosome, aes(x = length_mm, y = `protein_codinggenes`)) +
+  geom_point() +
+  labs(x = "Chromosome Size", y = "Protein Coding Genes") +
+  theme_minimal()
+```
+
+```{r,results=FASLE}
+ggplot(chromosome, aes(x = length_mm, y = mi_rna)) +
+  geom_point() +
+  labs(x = "Chromosome Size", y = "mi_rna") +
+  theme_minimal()
+```
+
+### 4. Calculate the same summary statistics for the 'proteins' data variables length and mass. Create a meaningful visualization of the relationship between these two variables by utilizing the ggplot2 package functions. Play with the colors, theme- and other visualization parameters to create a plot that pleases you
+
+```{r,results=FASLE}
+proteins <- tidybiology::proteins
+variables_of_proteins <- c("length", "mass")
+summary_stats_proteins <- proteins %>%
+  summarise_at(vars(one_of(variables_of_proteins)), 
+               list(mean = ~mean(., na.rm = TRUE),
+                    median = ~median(., na.rm = TRUE),
+                    max = ~max(., na.rm = TRUE)))
+summary_stats_proteins
+```
+
+```{r,results=FASLE}
+ggplot(proteins, aes(x = length, y = mass)) +
+  geom_point(color = "blue", size = 1) +
+  labs(x = "length", y = "mass") +
+  theme_minimal() +
+  theme(
+    text = element_text(color = "darkblue"),  # Change text color
+    axis.text.x = element_text(color = "black"),  # Change x-axis text color
+    axis.text.y = element_text(color = "black"))
+```
